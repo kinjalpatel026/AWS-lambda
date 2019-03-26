@@ -45,9 +45,8 @@ jobs:
             python3 --version
             sudo apt install python3-pip
             pip3 --version
-    
       - run:
-          name: Update zip in lambda
+          name: Update zip in lambda function
           command: |
-
+            sudo pip3 install awscli
             aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019  --zip-file=csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
