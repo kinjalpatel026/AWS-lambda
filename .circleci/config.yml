@@ -12,6 +12,7 @@ jobs:
             ls -al
             gradle build
             cd build/libs
+            pwd
             ls -al
             cd ../../..
       - run:
@@ -25,7 +26,7 @@ jobs:
             pwd
             ls -al
             mkdir -p lambda_artifact
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp/build/libs/*.jar
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip build/libs/*.jar
             ls -al
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip lambda_artifact/
             ls -al
