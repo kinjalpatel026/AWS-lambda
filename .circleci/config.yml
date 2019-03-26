@@ -51,3 +51,5 @@ jobs:
             sudo pip3 install awscli
             cd lambda_artifact
 	    aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019 --zip-file csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
+
+
