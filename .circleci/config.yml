@@ -45,12 +45,7 @@ jobs:
             python3 --version
             sudo apt install python3-pip
             pip3 --version
-      - run:
-          name: Upload Artifact to S3
-          command: |
-            sudo pip3 install awscli
-            cd lambda_artifact
-            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${bucketName}
+    
       - run:
           name: Update zip in lambda
           command: |
