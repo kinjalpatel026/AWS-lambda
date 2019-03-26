@@ -49,4 +49,4 @@ jobs:
           name: Update zip in lambda function
           command: |
             sudo pip3 install awscli
-            aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019  --zip-file fileb://build/libs/*.jar
+            aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019  --zip-file fileb://build/libs/lamda-1.0-SNAPSHOT.jar
