@@ -8,7 +8,8 @@ jobs:
       - run:
           name: Build Artifact
           command: |
-            cd webapp
+            cd csye6225-spring2019-lambda
+            pwd
             ./gradlew war
             gradle build
             cd build/libs
