@@ -10,9 +10,6 @@ jobs:
           command: |
             pwd
             ls -al
-            cd lambda
-            pwd
-            ./gradlew war
             gradle build
             cd build/libs
             ls -al
