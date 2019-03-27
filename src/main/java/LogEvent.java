@@ -16,7 +16,7 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
 import org.springframework.beans.factory.annotation.Value;
-
+import java.io.*;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -106,17 +106,11 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
  context.getLogger().log("Item with id "+request.getRecords().get(0).getSNS().getMessage()+" already exist");
  }
  }
- catch(AmazonServiceException ase){
+ catch(Exception e){
  context.getLogger().log("Could not complete operation");
- context.getLogger().log("Error Message: " + ase.getMessage());
- context.getLogger().log("HTTP Status: " + ase.getStatusCode());
- context.getLogger().log("AWS Error Code: " + ase.getErrorCode());
- context.getLogger().log("Error Type: " + ase.getErrorType());
- context.getLogger().log("Request ID: " + ase.getRequestId());
  }
- catch (AmazonClientException ace) {
+ catch (Exception e) {
  context.getLogger().log("Internal error occured communicating with DynamoDB");
- context.getLogger().log("Error Message: " + ace.getMessage());
  }
  catch(Exception e){
  context.getLogger().log(e.getMessage());
