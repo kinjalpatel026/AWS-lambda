@@ -25,6 +25,7 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-beans', version: '3.0.5.RELEASE'
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.525'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.525'
 
 }
 
