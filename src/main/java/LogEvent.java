@@ -29,11 +29,11 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
         context.getLogger().log("Invocation completed: " + timeStamp);
-        final String FROM = "kinjal@csye6225-spring2019-patelkin.me";
+        final String FROM = "kinjal@csye6225-spring2019-kuvalekars.me";
 
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        final String TO = "patel.kin@husky.neu.edu";
+        final String TO = "kuvalekar.s@husky.neu.edu";
 
 
         // The configuration set to use for this email. If you do not want to use a
