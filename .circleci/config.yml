@@ -10,8 +10,8 @@ jobs:
           command: |
             pwd
             ls -al
-            gradle build
-            cd build/libs
+            gradle buildZip
+            cd build/distributions
             pwd
             ls -al
             cd ../../..
@@ -30,4 +30,4 @@ jobs:
           name: Update zip in lambda function
           command: |
             sudo pip3 install awscli
-            aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019  --zip-file fileb://build/libs/lamda-1.0-SNAPSHOT.jar
+            aws lambda update-function-code --region=us-east-1 --function-name=csye6225_spring2019  --zip-file fileb://build/distributions/lamda-1.0-SNAPSHOT.zip
