@@ -27,6 +27,8 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.525'
 
     compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.525'
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-lambda-java-events
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '2.2.6'
 
 }
 
