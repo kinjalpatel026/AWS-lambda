@@ -23,6 +23,9 @@ dependencies {
     )
     // https://mvnrepository.com/artifact/org.springframework/spring-beans
     compile group: 'org.springframework', name: 'spring-beans', version: '3.0.5.RELEASE'
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.525'
+
 }
 
 task buildZip(type: Zip) {
