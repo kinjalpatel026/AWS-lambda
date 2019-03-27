@@ -33,7 +33,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        final String TO = "patel.kin@husky.neu.edu";
+        final String TO = "mahaddalkar.k@husky.neu.edu";
 
 
         // The configuration set to use for this email. If you do not want to use a
