@@ -109,9 +109,9 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
  catch(Exception e){
  context.getLogger().log("Could not complete operation");
  }
- catch (Exception e) {
- context.getLogger().log("Internal error occured communicating with DynamoDB");
- }
+//  catch (Exception e) {
+//  context.getLogger().log("Internal error occured communicating with DynamoDB");
+//  }
  catch(Exception e){
  context.getLogger().log(e.getMessage());
  }
