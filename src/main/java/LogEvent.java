@@ -78,7 +78,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         final String FROM = "no-reply@"+domain;
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        final String TO = "amahaalskhmi32@gmail.com";
+        final String TO = "amahaalakshmi32@gmail.com";
         if (emailAddress == null || emailAddress.equals("")) {
             throw new IllegalArgumentException("Email Address is not set yet.");
         }
