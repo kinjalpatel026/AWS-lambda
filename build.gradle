@@ -19,6 +19,7 @@ dependencies {
 dependencies {
     compile(
             'com.amazonaws:aws-lambda-java-core:+',
+            'com.amazonaws:aws-lambda-java-events:+'
     )
     // https://mvnrepository.com/artifact/org.springframework/spring-beans
     //compile group: 'org.springframework', name: 'spring-beans', version: '3.0.5.RELEASE'
