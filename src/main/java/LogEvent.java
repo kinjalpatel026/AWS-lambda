@@ -14,7 +14,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
-
+import java.util.UUID;
 public class LogEvent implements RequestHandler<SNSEvent, Object> {
     static DynamoDB dynamoDB;
     public Object handleRequest(SNSEvent request, Context context){
@@ -24,32 +24,37 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         context.getLogger().log(request.getRecords().get(0).getSNS().getMessage());
         String domain = System.getenv("Domain");
         context.getLogger().log("Domain : " + domain);
-        final String FROM = "no-reply@" + domain;
+
+        final String FROM = "no-reply@csye6225-s19-arunachalamm.me";
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         final String TO = request.getRecords().get(0).getSNS().getMessage();
 
         try {
+
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye6225");
             long unixTime = Instant.now().getEpochSecond()+20*60;
             if(table == null)
             {
-                context.getLogger().log("table is culprit");
+                context.getLogger().log("table not found");
             }
             else{
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
                 if(item==null) {
+                    String token = UUID.randomUUID().toString();
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
-                            .withString("token", context.getAwsRequestId())
-                            .withNumber("passwordTokenExpiry", unixTime);
+                            .withString("token", token)
+                            .withNumber("passwordTokenExpiry", unixTime)
+                            .withLong("TTL", 1200);
 
+                    context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
 
                     table.putItem(itemPut);
 
-                    String token = request.getRecords().get(0).getSNS().getMessageId();
+                    context.getLogger().log("AWS message ID:"+request.getRecords().get(0).getSNS().getMessageId());
                     AmazonSimpleEmailService client =
                             AmazonSimpleEmailServiceClientBuilder.standard()
                                     .withRegion(Regions.US_EAST_1).build();
