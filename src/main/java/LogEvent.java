@@ -35,7 +35,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye6225");
-            long unixTime = Instant.now().getEpochSecond()+20*60;
+            long unixTime = Instant.now().getEpochSecond()+2*60;
             if(table == null)
             {
                 context.getLogger().log("table not found");
@@ -48,7 +48,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
                             .withString("token", token)
                             .withNumber("passwordTokenExpiry", unixTime)
-                            .withLong("TTL", 1200);
+                            .withLong("TTL", 120);
 
                     context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
 
