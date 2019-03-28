@@ -22,15 +22,12 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
         context.getLogger().log("Invocation started: " + timeStamp);
         context.getLogger().log(request.getRecords().get(0).getSNS().getMessage());
-
-        timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
-        context.getLogger().log("Invocation completed: " + timeStamp);
-
-        final String FROM = "kinjal@csye6225-spring2019-patelkin.me";
-
+        String domain = System.getenv("Domain");
+        context.getLogger().log("Domain : " + domain);
+        final String FROM = "no-reply@" + domain;
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        String TO = request.getRecords().get(0).getSNS().getMessage();
+        final String TO = request.getRecords().get(0).getSNS().getMessage();
 
         try {
             context.getLogger().log("trying to connect to dynamodb");
@@ -70,7 +67,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                                                                                     "UTF-8")
                                                                             .withData(
                                                                                     "Please click on the below link to reset the password<br/>"+
-                                                                                            "<p><a href='#'>https://"+FROM+"/resetPwd?email="+TO+"&token="+token+"</a></p>"))
+                                                                                            "<p><a href='#'>http://"+domain+"/reset?email="+TO+"&token="+token+"</a></p>"))
                                             )
                                             .withSubject(
                                                     new Content().withCharset("UTF-8")
@@ -87,6 +84,10 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             context.getLogger().log ("The email was not sent. Error message: "
                     + ex.getMessage());
         }
+
+
+        timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
+        context.getLogger().log("Invocation completed: " + timeStamp);
         return null;
     }
 
