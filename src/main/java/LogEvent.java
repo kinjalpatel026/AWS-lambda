@@ -82,6 +82,32 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                 }
                 else {
                     context.getLogger().log(item.toJSON() + "Email Already sent!");
+
+                    try {
+                        AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
+                                .withRegion(Regions.US_EAST_1).build();
+
+                        String body = "Password reset link already sent";
+
+                        SendEmailRequest emailRequest = new SendEmailRequest()
+                                .withDestination(
+                                        new Destination().withToAddresses(TO))
+                                .withMessage(new Message()
+                                        .withBody(new Body()
+                                                .withHtml(new Content()
+                                                        .withCharset("UTF-8").withData(body))
+                                        )
+                                        .withSubject(new Content()
+                                                .withCharset("UTF-8").withData("Reset Link Already sent")))
+                                .withSource(FROM);
+                        client.sendEmail(emailRequest);
+
+
+                        System.out.println("Email sent successfully!");
+                    } catch (Exception ex) {
+                        System.out.println("The email was not sent. Error message: "
+                                + ex.getMessage());
+                    }
                 }
             }
         } catch (Exception ex) {
