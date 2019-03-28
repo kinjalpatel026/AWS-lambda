@@ -13,11 +13,7 @@ import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
-import com.amazonaws.services.simpleemail.model.Body;
-import com.amazonaws.services.simpleemail.model.Content;
-import com.amazonaws.services.simpleemail.model.Destination;
-import com.amazonaws.services.simpleemail.model.Message;
-import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import com.amazonaws.services.simpleemail.model.*;
 
 public class LogEvent implements RequestHandler<SNSEvent, Object> {
     static DynamoDB dynamoDB;
@@ -33,7 +29,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        final String TO = "patel.kin@husky.neu.edu";
+        String TO = request.getRecords().get(0).getSNS().getMessage();
 
         // The configuration set to use for this email. If you do not want to use a
         // configuration set, comment the following variable and the
@@ -55,7 +51,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye-6225");
-//            long unixTime = Instant.now().getEpochSecond()+20*60;
+            long unixTime = Instant.now().getEpochSecond()+20*60;
             if(table == null)
             {
                 context.getLogger().log("table is culprit");
@@ -64,9 +60,39 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
                 if(item==null) {
                     Item itemPut = new Item()
-                            .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage());
+                            .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
+                            .withString("token", context.getAwsRequestId())
+                            .withNumber("passwordTokenExpiry", unixTime);
+
 
                     table.putItem(itemPut);
+
+                    String token = request.getRecords().get(0).getSNS().getMessageId();
+                    AmazonSimpleEmailService client =
+                            AmazonSimpleEmailServiceClientBuilder.standard()
+                                    .withRegion(Regions.US_EAST_1).build();
+                    SendEmailRequest req = new SendEmailRequest()
+                            .withDestination(
+                                    new Destination()
+                                            .withToAddresses(TO))
+                            .withMessage(
+                                    new Message()
+                                            .withBody(
+                                                    new Body()
+                                                            .withHtml(
+                                                                    new Content()
+                                                                            .withCharset(
+                                                                                    "UTF-8")
+                                                                            .withData(
+                                                                                    "Please click on the below link to reset the password<br/>"+
+                                                                                            "<p><a href='#'>https://"+FROM+"/resetPwd?email="+TO+"&token="+token+"</a></p>"))
+                                            )
+                                            .withSubject(
+                                                    new Content().withCharset("UTF-8")
+                                                            .withData("Password Reset Link")))
+                            .withSource(FROM);
+                    SendEmailResult response = client.sendEmail(req);
+                    System.out.println("Email sent!");
                 }
                 else {
                     context.getLogger().log(item.toJSON() + "Above Item");
@@ -76,33 +102,6 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         } catch (Exception ex) {
             context.getLogger().log ("The email was not sent. Error message: "
-                    + ex.getMessage());
-        }
-        try {
-            AmazonSimpleEmailService client =
-                    AmazonSimpleEmailServiceClientBuilder.standard()
-                            // Replace US_WEST_2 with the AWS Region you're using for
-                            // Amazon SES.
-                            .withRegion(Regions.US_EAST_1).build();
-            SendEmailRequest emailrequest = new SendEmailRequest()
-                    .withDestination(
-                            new Destination().withToAddresses(TO))
-                    .withMessage(new Message()
-                            .withBody(new Body()
-                                    .withHtml(new Content()
-                                            .withCharset("UTF-8").withData(HTMLBODY))
-                                    .withText(new Content()
-                                            .withCharset("UTF-8").withData(TEXTBODY)))
-                            .withSubject(new Content()
-                                    .withCharset("UTF-8").withData(SUBJECT)))
-                    .withSource(FROM);
-            // Comment or remove the next line if you are not using a
-            // configuration set
-            //.withConfigurationSetName(CONFIGSET);
-            client.sendEmail(emailrequest);
-            System.out.println("Email sent!");
-        } catch (Exception ex) {
-            System.out.println("The email was not sent. Error message: "
                     + ex.getMessage());
         }
         return null;
