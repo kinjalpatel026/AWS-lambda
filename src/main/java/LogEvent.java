@@ -50,7 +50,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         try {
             context.getLogger().log("trying to connect to dynamodb");
             init();
-            Table table = dynamoDB.getTable("csye-6225");
+            Table table = dynamoDB.getTable("csye6225");
             long unixTime = Instant.now().getEpochSecond()+20*60;
             if(table == null)
             {
