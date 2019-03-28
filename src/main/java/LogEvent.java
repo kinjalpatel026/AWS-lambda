@@ -87,7 +87,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                                 .withRegion(Regions.US_EAST_1).build();
 
                         String body = "Password reset link already sent";
-
+                        String token = UUID.randomUUID().toString();
                         SendEmailRequest req = new SendEmailRequest()
                                 .withDestination(
                                         new Destination()
