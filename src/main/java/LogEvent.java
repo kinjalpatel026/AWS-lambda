@@ -78,7 +78,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         final String FROM = "no-reply@"+domain;
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
-        final String TO = "arunachalam.m@husky.neu.edu";
+        final String TO = "amahaalskhmi32@gmail.com";
         if (emailAddress == null || emailAddress.equals("")) {
             throw new IllegalArgumentException("Email Address is not set yet.");
         }
@@ -135,7 +135,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         try {
             String token = randomToken();
             Calendar cal = Calendar.getInstance(); //current date and time
-            cal.add(Calendar.MINUTE, 20); //add days
+            cal.add(Calendar.MINUTE, 2); //add days
             double ttl =  (cal.getTimeInMillis() / 1000L);
             Item item = new Item().withPrimaryKey("email", emailAddress).withString("reset_token", token)
                     .withDouble("ttl", ttl);
