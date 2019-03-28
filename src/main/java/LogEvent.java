@@ -47,7 +47,8 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
                             .withString("token", token)
-                            .withNumber("passwordTokenExpiry", 120);
+                            .withNumber("passwordTokenExpiry", unixTime)
+                            .withLong("TTL", 120);
 
                     context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
 
@@ -81,43 +82,40 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     System.out.println("Email sent!");
                 }
                 else {
-                    context.getLogger().log(item.toJSON() + "Email Already sent!");
+                    try {
+                        AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
+                                .withRegion(Regions.US_EAST_1).build();
 
-                    String token = UUID.randomUUID().toString();
-                    Item itemPut = new Item()
-                            .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
-                            .withString("token", token)
-                            .withNumber("passwordTokenExpiry", 120);
+                        String body = "Password reset link already sent";
 
-                    context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
+                        SendEmailRequest req = new SendEmailRequest()
+                                .withDestination(
+                                        new Destination()
+                                                .withToAddresses(TO))
+                                .withMessage(
+                                        new Message()
+                                                .withBody(
+                                                        new Body()
+                                                                .withHtml(
+                                                                        new Content()
+                                                                                .withCharset(
+                                                                                        "UTF-8")
+                                                                                .withData(
+                                                                                        "Please click on the below link to reset the password<br/>"+
+                                                                                                "<p><a href='#'>http://"+domain+"/reset?email="+TO+"&token="+token+"</a></p>"))
+                                                )
+                                                .withSubject(
+                                                        new Content().withCharset("UTF-8")
+                                                                .withData("Password Reset Link")))
+                                .withSource(FROM);
+                        SendEmailResult response = client.sendEmail(req);
+                        System.out.println("Email sent!");
 
-                    table.putItem(itemPut);
-
-                    context.getLogger().log("AWS message ID:"+request.getRecords().get(0).getSNS().getMessageId());
-                    AmazonSimpleEmailService client =
-                            AmazonSimpleEmailServiceClientBuilder.standard()
-                                    .withRegion(Regions.US_EAST_1).build();
-                    SendEmailRequest req = new SendEmailRequest()
-                            .withDestination(
-                                    new Destination()
-                                            .withToAddresses(TO))
-                            .withMessage(
-                                    new Message()
-                                            .withBody(
-                                                    new Body()
-                                                            .withHtml(
-                                                                    new Content()
-                                                                            .withCharset(
-                                                                                    "UTF-8")
-                                                                            .withData(
-                                                                                    "Please click on the below link to reset the password<br/>"+
-                                                                                            "<p><a href='#'>http://"+domain+"/reset?email="+TO+"&token="+token+"</a></p>"))
-                                            )
-                                            .withSubject(
-                                                    new Content().withCharset("UTF-8")
-                                                            .withData("Password Reset Link")))
-                            .withSource(FROM);
-                    SendEmailResult response = client.sendEmail(req);
+                        System.out.println("Email sent successfully!");
+                    } catch (Exception ex) {
+                        System.out.println("The email was not sent. Error message: "
+                                + ex.getMessage());
+                    }
                 }
             }
         } catch (Exception ex) {
