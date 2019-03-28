@@ -29,7 +29,8 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
         context.getLogger().log("Invocation completed: " + timeStamp);
-
+        String domain = System.getenv("DOMAIN");
+        context.getLogger().log(domain);
         final String FROM = "kinjal@csye6225-spring2019-kuvalekars.me";
 
         // Replace recipient@example.com with a "To" address. If your account
