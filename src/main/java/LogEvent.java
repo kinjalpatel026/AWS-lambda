@@ -25,28 +25,13 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
         context.getLogger().log("Invocation completed: " + timeStamp);
+
         final String FROM = "kinjal@csye6225-spring2019-patelkin.me";
 
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         String TO = request.getRecords().get(0).getSNS().getMessage();
 
-        // The configuration set to use for this email. If you do not want to use a
-        // configuration set, comment the following variable and the
-        // .withConfigurationSetName(CONFIGSET); argument below.
-        //final String CONFIGSET = "ConfigSet";
-
-        // The subject line for the email.
-        final String SUBJECT = "Amazon SES test (AWS SDK for Java)";
-        // The HTML body for the email.
-        final String HTMLBODY = "<h1>Amazon SES test (AWS SDK for Java)</h1>"
-                + "<p>This email was sent with <a href='https://aws.amazon.com/ses/'>"
-                + "Amazon SES</a> using the <a href='https://aws.amazon.com/sdk-for-java/'>"
-                + "AWS SDK for Java</a>";
-
-        // The email body for recipients with non-HTML email clients.
-        final String TEXTBODY = "This email was sent through Amazon SES "
-                + "using the AWS SDK for Java.";
         try {
             context.getLogger().log("trying to connect to dynamodb");
             init();
@@ -95,11 +80,9 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     System.out.println("Email sent!");
                 }
                 else {
-                    context.getLogger().log(item.toJSON() + "Above Item");
-                    context.getLogger().log("Above Item");
+                    context.getLogger().log(item.toJSON() + "Email Already sent!");
                 }
             }
-
         } catch (Exception ex) {
             context.getLogger().log ("The email was not sent. Error message: "
                     + ex.getMessage());
