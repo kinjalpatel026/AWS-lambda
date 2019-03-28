@@ -18,9 +18,11 @@ import com.amazonaws.services.simpleemail.model.Content;
 import com.amazonaws.services.simpleemail.model.Destination;
 import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
-
+import org.springframework.beans.factory.annotation.Value;
 public class LogEvent implements RequestHandler<SNSEvent, Object> {
     static DynamoDB dynamoDB;
+    @Value("${domainName}")
+    private String domainName;
     public Object handleRequest(SNSEvent request, Context context){
 
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -29,7 +31,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
 
         timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
         context.getLogger().log("Invocation completed: " + timeStamp);
-        final String FROM = "maha@csye6225-s19-arunachalamm.me";
+        final String FROM = "maha@"+domainName;
 
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
