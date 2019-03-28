@@ -25,7 +25,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         String domain = System.getenv("Domain");
         context.getLogger().log("Domain : " + domain);
 
-        final String FROM = "no-reply@csye6225-s19-arunachalamm.me";
+        final String FROM = "no-reply@"+domain;
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         final String TO = request.getRecords().get(0).getSNS().getMessage();
@@ -82,32 +82,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     System.out.println("Email sent!");
                 }
                 else {
-
-                    try {
-                        AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
-                                .withRegion(Regions.US_EAST_1).build();
-
-                        String body = "Password reset link already sent";
-
-                        SendEmailRequest emailRequest = new SendEmailRequest()
-                                .withDestination(
-                                        new Destination().withToAddresses(TO))
-                                .withMessage(new Message()
-                                        .withBody(new Body()
-                                                .withHtml(new Content()
-                                                        .withCharset("UTF-8").withData(body))
-                                        )
-                                        .withSubject(new Content()
-                                                .withCharset("UTF-8").withData("Reset Link Already sent")))
-                                .withSource(FROM);
-                        client.sendEmail(emailRequest);
-
-
-                        System.out.println("Email sent successfully!");
-                    } catch (Exception ex) {
-                        System.out.println("The email was not sent. Error message: "
-                                + ex.getMessage());
-                    }
+                    context.getLogger().log(item.toJSON() + "Email Already sent!");
                 }
             }
         } catch (Exception ex) {
