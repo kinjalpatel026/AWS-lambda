@@ -24,7 +24,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         context.getLogger().log(request.getRecords().get(0).getSNS().getMessage());
         String domain = System.getenv("Domain");
         context.getLogger().log("Domain : " + domain);
-        final String FROM = "no-reply@" + domain;
+        final String FROM = "no-reply@csye6225-s19-arunachalamm.me";
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         final String TO = request.getRecords().get(0).getSNS().getMessage();
