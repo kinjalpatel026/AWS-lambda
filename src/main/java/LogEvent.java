@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
@@ -82,11 +83,12 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     SendEmailResult response = client.sendEmail(req);
                     System.out.println("Email sent!");
                 }
-                else if((Long)item.get("passwordTokenExpiry")<=now){
-                    context.getLogger().log(item.get("passwordTokenExpiry").toString());
-                    context.getLogger().log(item.toJSON() + "Email Already sent!");
-                }
+//                else if((Long)item.get("passwordTokenExpiry")<= now){
+//                    context.getLogger().log(item.get("passwordTokenExpiry").toString());
+//                    context.getLogger().log(item.toJSON() + "Email Already sent!");
+//                }
                 else {
+                    context.getLogger().log(item.get("passwordTokenExpiry").toString());
                     context.getLogger().log(item.toJSON() + "Email Already sent!");
                 }
             }
