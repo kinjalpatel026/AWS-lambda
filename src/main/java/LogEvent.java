@@ -45,7 +45,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             }
             else{
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
-                if(item==null) {
+                if(Long.parseLong(item.get("passwordTokenExpiry").toString())> now) {
                     String token = UUID.randomUUID().toString();
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
@@ -82,10 +82,6 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                             .withSource(FROM);
                     SendEmailResult response = client.sendEmail(req);
                     System.out.println("Email sent!");
-                }
-                else if(Long.parseLong(item.get("passwordTokenExpiry").toString())<= now){
-                    context.getLogger().log(item.get("passwordTokenExpiry").toString());
-                    context.getLogger().log(item.toJSON() + "Email Already sent!");
                 }
                 else {
                     context.getLogger().log(item.toJSON() + "Email Already sent!");
