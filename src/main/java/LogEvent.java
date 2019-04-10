@@ -35,13 +35,16 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye6225");
-            long unixTime = Instant.now().getEpochSecond()+2*60;
-            if(table == null)
-            {
+            long unixTime = Instant.now().getEpochSecond()+3*60;
+            long now = Instant.now().getEpochSecond();
+            context.getLogger().log(unixTime + " unixTime");
+            context.getLogger().log("now "+ Instant.now().getEpochSecond());
+            if(table == null) {
                 context.getLogger().log("table not found");
             }
             else{
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
+                context.getLogger().log(item.get("passwordTokenExpiry").toString());
                 if(item==null) {
                     String token = UUID.randomUUID().toString();
                     Item itemPut = new Item()
@@ -79,6 +82,9 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                             .withSource(FROM);
                     SendEmailResult response = client.sendEmail(req);
                     System.out.println("Email sent!");
+                }
+                else if((Long)item.get("passwordTokenExpiry")<=now){
+                    context.getLogger().log(item.toJSON() + "Email Already sent!");
                 }
                 else {
                     context.getLogger().log(item.toJSON() + "Email Already sent!");
