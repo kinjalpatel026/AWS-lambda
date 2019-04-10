@@ -30,17 +30,21 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         final String TO = request.getRecords().get(0).getSNS().getMessage();
+        int timeMin = 20
+        int timeSec = 60;
+        int timeTtl = timeMin * timeSec;
 
         try {
 
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye6225");
-            long unixTime = Instant.now().getEpochSecond()+3*60;
-            long now = Instant.now().getEpochSecond();
-            context.getLogger().log(unixTime + " calculated time");
-            context.getLogger().log(Instant.now().getEpochSecond() + " current time ");
-            if(table == null) {
+            Calendar cal = Calendar.getInstance(); //current date and time
+            cal.add(Calendar.MINUTE, timeMin); //add days
+            double unixTime =  (cal.getTimeInMillis() / 1000L);
+//            long unixTime = Instant.now().getEpochSecond()+1*60;
+            if(table == null)
+            {
                 context.getLogger().log("table not found");
             }
             else{
@@ -50,7 +54,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
                             .withString("token", token)
-                            .withNumber("passwordTokenExpiry", unixTime);
+                            .withDouble("passwordTokenExpiry", unixTime);
 
                     context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
 
@@ -82,6 +86,57 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                             .withSource(FROM);
                     SendEmailResult response = client.sendEmail(req);
                     System.out.println("Email sent!");
+                    System.out.println("Time!"+ item);
+                }
+                else if(item!=null) {
+                    Calendar calNow = Calendar.getInstance(); //current date and time
+ //                   calNow.add(Calendar.MINUTE, 2); //add days
+                    double currentUnixTime =  (calNow.getTimeInMillis() / 1000L);
+//                    long currentUnixTime = Instant.now().getEpochSecond()+1*60;
+                    if((currentUnixTime - item.getDouble("passwordTokenExpiry"))>=timeTtl) {
+                        try {
+                            String token = UUID.randomUUID().toString();
+                            Item itemPut = new Item()
+                                    .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
+                                    .withString("token", token)
+                                    .withDouble("passwordTokenExpiry", currentUnixTime);
+
+                            context.getLogger().log("AWS request ID:" + context.getAwsRequestId());
+
+                            table.putItem(itemPut);
+
+                            context.getLogger().log("AWS message ID:" + request.getRecords().get(0).getSNS().getMessageId());
+                            AmazonSimpleEmailService client =
+                                    AmazonSimpleEmailServiceClientBuilder.standard()
+                                            .withRegion(Regions.US_EAST_1).build();
+                            SendEmailRequest req = new SendEmailRequest()
+                                    .withDestination(
+                                            new Destination()
+                                                    .withToAddresses(TO))
+                                    .withMessage(
+                                            new Message()
+                                                    .withBody(
+                                                            new Body()
+                                                                    .withHtml(
+                                                                            new Content()
+                                                                                    .withCharset(
+                                                                                            "UTF-8")
+                                                                                    .withData(
+                                                                                            "Please click on the below link to reset the password<br/>" +
+                                                                                                    "<p><a href='#'>http://" + domain + "/reset?email=" + TO + "&token=" + token + "</a></p>"))
+                                                    )
+                                                    .withSubject(
+                                                            new Content().withCharset("UTF-8")
+                                                                    .withData("Password Reset Link")))
+                                    .withSource(FROM);
+                            SendEmailResult response = client.sendEmail(req);
+                            System.out.println("Email sent!");
+                            System.out.println("Time!" + item);
+                        } catch (Exception ex) {
+                            System.out.println("The email was not sent. Error message: "
+                                    + ex.getMessage());
+                        }
+                    }
                 }
                 else {
                     context.getLogger().log(item.toJSON() + "Email Already sent!");
