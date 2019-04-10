@@ -89,48 +89,49 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                     calNow.add(Calendar.MINUTE, 2); //add days
                     double currentUnixTime =  (calNow.getTimeInMillis() / 1000L);
 //                    long currentUnixTime = Instant.now().getEpochSecond()+1*60;
+                    if((currentUnixTime - item.getDouble("passwordTokenExpiry"))>=120) {
+                        try {
+                            String token = UUID.randomUUID().toString();
+                            Item itemPut = new Item()
+                                    .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
+                                    .withString("token", token)
+                                    .withDouble("passwordTokenExpiry", currentUnixTime);
 
-                    try {
-                        String token = UUID.randomUUID().toString();
-                        Item itemPut = new Item()
-                                .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
-                                .withString("token", token)
-                                .withDouble("passwordTokenExpiry", currentUnixTime);
+                            context.getLogger().log("AWS request ID:" + context.getAwsRequestId());
 
-                        context.getLogger().log("AWS request ID:"+context.getAwsRequestId());
+                            table.putItem(itemPut);
 
-                        table.putItem(itemPut);
-
-                        context.getLogger().log("AWS message ID:"+request.getRecords().get(0).getSNS().getMessageId());
-                        AmazonSimpleEmailService client =
-                                AmazonSimpleEmailServiceClientBuilder.standard()
-                                        .withRegion(Regions.US_EAST_1).build();
-                        SendEmailRequest req = new SendEmailRequest()
-                                .withDestination(
-                                        new Destination()
-                                                .withToAddresses(TO))
-                                .withMessage(
-                                        new Message()
-                                                .withBody(
-                                                        new Body()
-                                                                .withHtml(
-                                                                        new Content()
-                                                                                .withCharset(
-                                                                                        "UTF-8")
-                                                                                .withData(
-                                                                                        "Please click on the below link to reset the password<br/>"+
-                                                                                                "<p><a href='#'>http://"+domain+"/reset?email="+TO+"&token="+token+"</a></p>"))
-                                                )
-                                                .withSubject(
-                                                        new Content().withCharset("UTF-8")
-                                                                .withData("Password Reset Link")))
-                                .withSource(FROM);
-                        SendEmailResult response = client.sendEmail(req);
-                        System.out.println("Email sent!");
-                        System.out.println("Time!"+ item);
-                    } catch (Exception ex) {
-                        System.out.println("The email was not sent. Error message: "
-                                + ex.getMessage());
+                            context.getLogger().log("AWS message ID:" + request.getRecords().get(0).getSNS().getMessageId());
+                            AmazonSimpleEmailService client =
+                                    AmazonSimpleEmailServiceClientBuilder.standard()
+                                            .withRegion(Regions.US_EAST_1).build();
+                            SendEmailRequest req = new SendEmailRequest()
+                                    .withDestination(
+                                            new Destination()
+                                                    .withToAddresses(TO))
+                                    .withMessage(
+                                            new Message()
+                                                    .withBody(
+                                                            new Body()
+                                                                    .withHtml(
+                                                                            new Content()
+                                                                                    .withCharset(
+                                                                                            "UTF-8")
+                                                                                    .withData(
+                                                                                            "Please click on the below link to reset the password<br/>" +
+                                                                                                    "<p><a href='#'>http://" + domain + "/reset?email=" + TO + "&token=" + token + "</a></p>"))
+                                                    )
+                                                    .withSubject(
+                                                            new Content().withCharset("UTF-8")
+                                                                    .withData("Password Reset Link")))
+                                    .withSource(FROM);
+                            SendEmailResult response = client.sendEmail(req);
+                            System.out.println("Email sent!");
+                            System.out.println("Time!" + item);
+                        } catch (Exception ex) {
+                            System.out.println("The email was not sent. Error message: "
+                                    + ex.getMessage());
+                        }
                     }
                 }
                 else {
