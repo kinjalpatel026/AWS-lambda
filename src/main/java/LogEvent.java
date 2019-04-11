@@ -36,7 +36,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             context.getLogger().log("trying to connect to dynamodb");
             init();
             Table table = dynamoDB.getTable("csye6225");
-            long unixTime = Instant.now().getEpochSecond()+3*60;
+            long unixTime = Instant.now().getEpochSecond()+20*60;
             long now = Instant.now().getEpochSecond();
             context.getLogger().log(unixTime + " calculated time");
             context.getLogger().log(Instant.now().getEpochSecond() + " current time ");
