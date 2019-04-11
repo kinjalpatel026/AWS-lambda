@@ -29,7 +29,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
         // Replace recipient@example.com with a "To" address. If your account
         // is still in the sandbox, this address must be verified.
         final String TO = request.getRecords().get(0).getSNS().getMessage();
-        int timeMin = 20
+        int timeMin = 20;
         int timeSec = 60;
         int timeTtl = timeMin * timeSec;
 
@@ -89,7 +89,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
                 }
                 else if(item!=null) {
                     Calendar calNow = Calendar.getInstance(); //current date and time
- //                   calNow.add(Calendar.MINUTE, 2); //add days
+                    //                   calNow.add(Calendar.MINUTE, 2); //add days
                     double currentUnixTime =  (calNow.getTimeInMillis() / 1000L);
 //                    long currentUnixTime = Instant.now().getEpochSecond()+1*60;
                     if((currentUnixTime - item.getDouble("passwordTokenExpiry"))>=timeTtl) {
