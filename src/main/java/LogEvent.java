@@ -1,4 +1,3 @@
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
@@ -49,7 +48,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             }
             else{
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
-                if(Long.parseLong(item.get("passwordTokenExpiry").toString())< now) {
+                if(item==nul) {
                     String token = UUID.randomUUID().toString();
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
