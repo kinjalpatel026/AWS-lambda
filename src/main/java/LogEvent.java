@@ -48,7 +48,7 @@ public class LogEvent implements RequestHandler<SNSEvent, Object> {
             }
             else{
                 Item item = table.getItem("id", request.getRecords().get(0).getSNS().getMessage());
-                if(item==nul) {
+                if(item==null) {
                     String token = UUID.randomUUID().toString();
                     Item itemPut = new Item()
                             .withPrimaryKey("id", request.getRecords().get(0).getSNS().getMessage())//string id
